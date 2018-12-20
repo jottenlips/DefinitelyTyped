@@ -67,7 +67,7 @@ function testSandbox() {
     sb.replaceSetter(replaceMe, 'setter', (v) => { });
 
     const cls = class {
-        foo() { }
+        foo(arg1: string, arg2: number) { return 1; }
         bar: number;
     };
     const PrivateFoo = class {
@@ -81,8 +81,8 @@ function testSandbox() {
 
     const stubInstance = sb.createStubInstance(cls);
     const privateFooStubbedInstance = sb.createStubInstance(PrivateFoo);
-    stubInstance.foo.calledWith('foo');
-    privateFooStubbedInstance.foo.calledWith('foo');
+    stubInstance.foo.calledWith('foo', 1);
+    privateFooStubbedInstance.foo.calledWith();
     const clsFoo: sinon.SinonStub = stubInstance.foo;
     const privateFooFoo: sinon.SinonStub = privateFooStubbedInstance.foo;
     const clsBar: number = stubInstance.bar;
@@ -417,6 +417,7 @@ function testSpy() {
 function testStub() {
     const obj = class {
         foo() { }
+        promiseFunc() { return Promise.resolve('foo'); }
     };
     const instance = new obj();
 
@@ -424,6 +425,10 @@ function testStub() {
     stub = sinon.stub(instance, 'foo').named('namedStub');
 
     const spy: sinon.SinonSpy = stub;
+
+    function promiseFunc(n: number) { return Promise.resolve('foo'); }
+    const promiseStub = sinon.stub(instance, 'promiseFunc');
+    promiseStub.resolves('test');
 
     sinon.stub(instance);
 
